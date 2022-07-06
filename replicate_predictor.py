@@ -1,6 +1,6 @@
 from min_dalle import MinDalle
 import tempfile
-from typing import Iterator
+from typing import Iterator, List
 from cog import BasePredictor, Path, Input
 
 
@@ -30,7 +30,7 @@ class ReplicatePredictor(BasePredictor):
             le=6,
             default=4
         ),
-    ) -> Iterator[Path]:
+    ) -> Iterator[List[Path]]:
         seed = -1
         log2_mid_count = 3 if intermediate_outputs else 0
         image_stream = self.model.generate_image_stream(
@@ -48,4 +48,16 @@ class ReplicatePredictor(BasePredictor):
             iter += 1
             image_path = path / 'min-dalle-iter-{}.jpg'.format(iter)
             image.save(str(image_path))
-            yield image_path
+            
+            tiles = slice(image_path, grid_size*grid_size, grid_size, grid_size)
+            i = 0
+            images = []
+            for tile in tiles:
+                filename = f'{i}.png'
+                tile.save(filename)
+                images.append(Path(filename))
+                i += 1
+            yield images
+
+            # yield image_path
+            
