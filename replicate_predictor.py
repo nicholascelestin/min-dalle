@@ -2,6 +2,7 @@ from min_dalle import MinDalle
 import tempfile
 from typing import Iterator, List
 from cog import BasePredictor, Path, Input
+from image_slicer import slice
 
 
 class ReplicatePredictor(BasePredictor):
@@ -48,7 +49,7 @@ class ReplicatePredictor(BasePredictor):
             iter += 1
             image_path = path / 'min-dalle-iter-{}.jpg'.format(iter)
             image.save(str(image_path))
-            
+
             tiles = slice(image_path, grid_size*grid_size, grid_size, grid_size)
             i = 0
             images = []
